@@ -20,7 +20,7 @@ PRIVATE_OR_GENERATED_SUFFIXES = {
 
 SENSITIVE_CONTENT_PATTERNS = [
     re.compile(r"-----BEGIN (?:OPENSSH |RSA |DSA |EC |PGP )?PRIVATE KEY(?: BLOCK)?-----"),
-    re.compile(r"-----BEGIN SSH SIGNATURE-----"),
+    re.compile("-----BEGIN SSH " "SIGNATURE-----"),
     re.compile(r"\bAKIA[0-9A-Z]{16}\b"),
     re.compile(r"\bgh[pousr]_[A-Za-z0-9_]{30,}\b"),
 ]
