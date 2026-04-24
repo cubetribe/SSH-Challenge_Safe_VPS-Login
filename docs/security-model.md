@@ -63,7 +63,7 @@ private key without ever receiving that private key.
 
 ## Implementation requirements
 
-Future reference implementations must test at least:
+Reference implementations must test at least:
 
 - valid signer succeeds
 - unknown signer fails
@@ -72,3 +72,6 @@ Future reference implementations must test at least:
 - replayed challenge fails
 - wrong namespace fails
 - malformed allowed signers file fails closed
+
+The Python package added in version `0.1.0` covers these cases with integration
+tests that call the local OpenSSH `ssh-keygen` binary.

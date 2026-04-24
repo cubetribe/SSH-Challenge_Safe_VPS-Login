@@ -63,18 +63,97 @@ apply it to browser-based and API-based admin approval flows.
 
 ## Project status
 
-Bootstrap stage. The repository currently contains project governance,
-licensing, and the security model. Reference implementation code will be added
-in a later step.
+Version `0.1.0` contains a framework-neutral Python reference implementation:
 
-Planned work:
+- canonical challenge creation
+- OpenSSH signing and verification helpers
+- in-memory challenge manager with expiry and replay protection
+- CLI for creating, signing, and verifying challenges
+- tests that exercise real OpenSSH signatures
 
-- language-neutral protocol specification
-- reference implementation for a Python/FastAPI admin flow
-- CLI helper for signing challenges
-- signer file format and rotation guidance
-- deployment examples for VPS-hosted services
-- integration tests around replay, expiry, namespace, and signer failures
+Future work may add web framework adapters and deployment templates, but the
+core package is intentionally dependency-free.
+
+## Install
+
+From a checkout:
+
+```sh
+python3 -m pip install -e .
+```
+
+For development:
+
+```sh
+python3 -m pip install -e ".[dev]"
+pytest
+ruff check .
+```
+
+OpenSSH must be available on `PATH` because signing and verification use
+`ssh-keygen -Y sign` and `ssh-keygen -Y verify`.
+
+## CLI quickstart
+
+Create a challenge:
+
+```sh
+ssh-challenge-safe-vps-login create-challenge \
+  --service my-vps-admin \
+  --origin https://admin.example.com \
+  --username operator \
+  --json > challenge.json
+```
+
+Save the `message` value from that JSON as `challenge.txt`, then sign it on the
+operator machine:
+
+```sh
+ssh-challenge-safe-vps-login sign \
+  --key ~/.ssh/id_ed25519 \
+  --message-file challenge.txt > challenge.sig
+```
+
+Verify against an OpenSSH allowed signers file:
+
+```sh
+ssh-challenge-safe-vps-login verify \
+  --allowed-signers allowed_signers \
+  --identity operator \
+  --message-file challenge.txt \
+  --signature-file challenge.sig
+```
+
+## Python quickstart
+
+```python
+from pathlib import Path
+
+from ssh_challenge_safe_vps_login import ChallengeManager
+
+manager = ChallengeManager(
+    service="my-vps-admin",
+    origin="https://admin.example.com",
+    allowed_signers_path=Path("/etc/my-app/allowed_signers"),
+    ttl_seconds=120,
+)
+
+challenge = manager.create(username="operator", client_ip="203.0.113.10")
+
+# Show challenge.message() to the operator, then verify the posted signature.
+result = manager.verify(
+    challenge_id=challenge.challenge_id,
+    username="operator",
+    signature=posted_signature,
+)
+
+if not result.ok:
+    raise PermissionError(result.reason)
+```
+
+See [docs/integration.md](docs/integration.md) and
+[docs/security-model.md](docs/security-model.md) before using this in a
+production admin surface.
 
 ## License
 

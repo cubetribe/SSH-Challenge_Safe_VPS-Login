@@ -2,7 +2,7 @@
 
 ## Current phase
 
-Greenfield bootstrap for initial GitHub publication.
+First implementation after initial GitHub publication.
 
 ## Workspace
 
@@ -26,8 +26,10 @@ Greenfield bootstrap for initial GitHub publication.
   requires separate permission.
 - Establish `main` as initial branch only because the remote repository has no
   default branch yet.
+- Implement the first working version as a dependency-free Python package plus
+  CLI, with OpenSSH delegated to `ssh-keygen`.
 
 ## Next required gate
 
-Prepare local Git repository, validate docs-only diff, then ask for explicit
-push approval.
+Run compile, test, lint, whitespace, and secret-sanity checks, then commit and
+push under the user's standing approval for this run.

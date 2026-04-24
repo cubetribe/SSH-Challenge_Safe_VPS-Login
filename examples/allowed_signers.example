@@ -1,0 +1,3 @@
+# One operator per line. Use real public keys in deployments.
+operator ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAA... operator@example
+

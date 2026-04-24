@@ -34,10 +34,12 @@ public keys.
 
 ## Release law
 
-- Current release state: bootstrap only, no packaged release yet.
+- Current release state: manual SemVer package starting at `0.1.0`.
 - Release model: manual SemVer after the first implementation exists.
-- Do not create a version number, changelog, tag, package manifest, or release
-  artifact until there is implementation code to ship.
+- Keep `pyproject.toml`, `src/ssh_challenge_safe_vps_login/__init__.py`, and
+  `CHANGELOG.md` aligned when preparing release commits.
+- Do not create Git tags or GitHub releases unless the user explicitly asks for
+  a release publication step.
 - Classify work as:
   - `major`: breaking protocol, API, CLI, config, or verification behavior
   - `minor`: backward-compatible feature or new integration
@@ -47,9 +49,10 @@ public keys.
 ## Validation
 
 - For docs-only work, run `git diff --check` and inspect `git status`.
-- For future code, add the narrowest meaningful tests around challenge
-  creation, signature verification, replay protection, expiry, signer parsing,
-  and session handling.
+- For code work, run `python3 -m compileall src tests`, `pytest`, and
+  `ruff check .` when available.
+- Keep tests around challenge creation, signature verification, replay
+  protection, expiry, signer parsing, and session handling.
 - Any auth behavior change must include negative tests for invalid signer,
   expired challenge, replayed challenge, wrong namespace, and tampered message.
 
