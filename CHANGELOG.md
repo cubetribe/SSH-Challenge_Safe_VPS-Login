@@ -19,4 +19,5 @@ This project follows manual Semantic Versioning after the first implementation.
 - Tests for valid signer, unknown signer, tampered message, expired challenge,
   replayed challenge, wrong namespace, and malformed allowed signers handling.
 - CI validation for lint, tests, and package builds.
-- Integration and security documentation.
+- Integration and security documentation, including a copy-prompt for local
+  coding assistants and a safer installation guide.

@@ -8,6 +8,44 @@ machine with an existing SSH private key, and the server verifies the OpenSSH
 signature against an allowlist of public keys. The private key never leaves the
 operator machine.
 
+## Copy-prompt for local coding assistants
+
+Use this prompt when you want a local coding assistant to integrate the project
+into another app:
+
+```text
+Integrate SSH Challenge Safe VPS Login into this project.
+
+Source repository:
+https://github.com/cubetribe/SSH-Challenge_Safe_VPS-Login
+
+Goal:
+- Protect the admin or operator area with an SSH-key challenge instead of a
+  username/password login.
+- Use the repository as the source of truth. Read README.md,
+  docs/security-model.md, docs/integration.md, and the Python package under
+  src/ssh_challenge_safe_vps_login.
+- Add the dependency from the GitHub repository or vendor the package code into
+  a clearly named internal module if the project cannot use Git dependencies.
+- Keep private SSH keys on the operator machine only. Never commit private keys,
+  production allowed-signers files, signatures, tokens, .env files, or real
+  challenge payloads.
+- Implement a flow where the server creates a short-lived one-time challenge,
+  the operator signs the exact message locally with OpenSSH, and the server
+  verifies the signature against an allowed-signers file.
+- Add tests for: valid signer, unknown signer, expired challenge, replayed
+  challenge, wrong namespace, tampered message, and malformed allowed signers.
+- Keep existing app security in place: HTTPS, secure HTTP-only same-site
+  cookies, CSRF protection for browser mutations, rate limiting, and audit logs
+  without secret material.
+- Update the target project's README, deployment notes, and environment examples
+  so another developer can configure the signer file and session settings safely.
+
+Before finishing:
+- Run the target project's lint, tests, and any package/build checks.
+- Show the changed files, validation commands, and remaining assumptions.
+```
+
 ## Why this exists
 
 Admin dashboards, deployment controls, and emergency operations often end up
@@ -18,6 +56,10 @@ or leaked through logs and support tooling.
 This project extracts an approach that has already been used in private
 projects: use the SSH key that already controls trusted operator access, but
 apply it to browser-based and API-based admin approval flows.
+
+The project is intentionally small. It gives you the core challenge/sign/verify
+building blocks, then lets your app keep responsibility for sessions, CSRF,
+rate limiting, logging, and deployment policy.
 
 ## Core flow
 
@@ -76,22 +118,39 @@ core package is intentionally dependency-free.
 
 ## Install
 
-From a checkout:
-
-```sh
-python3 -m pip install -e .
-```
-
-For development:
-
-```sh
-python3 -m pip install -e ".[dev]"
-pytest
-ruff check .
-```
-
 OpenSSH must be available on `PATH` because signing and verification use
 `ssh-keygen -Y sign` and `ssh-keygen -Y verify`.
+
+For a first local test, clone the repository and install it in a virtual
+environment:
+
+```sh
+git clone https://github.com/cubetribe/SSH-Challenge_Safe_VPS-Login.git
+cd SSH-Challenge_Safe_VPS-Login
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e .
+```
+
+For development work, install the test and build tools too:
+
+```sh
+python -m pip install -e ".[dev]"
+ruff check .
+pytest
+python -m build
+```
+
+If another project should depend on this package directly from GitHub, use a
+Git dependency in that project's packaging config or install command:
+
+```sh
+python -m pip install \
+  "ssh-challenge-safe-vps-login @ git+https://github.com/cubetribe/SSH-Challenge_Safe_VPS-Login.git@main"
+```
+
+For production, pin a commit SHA or release tag instead of tracking `main`.
 
 ## CLI quickstart
 
@@ -105,8 +164,18 @@ ssh-challenge-safe-vps-login create-challenge \
   --json > challenge.json
 ```
 
-Save the `message` value from that JSON as `challenge.txt`, then sign it on the
-operator machine:
+Save the `message` value from that JSON as `challenge.txt`. The operator signs
+that exact file on the machine that owns the SSH private key:
+
+```sh
+python - <<'PY'
+import json
+from pathlib import Path
+
+payload = json.loads(Path("challenge.json").read_text(encoding="utf-8"))
+Path("challenge.txt").write_text(payload["message"], encoding="utf-8")
+PY
+```
 
 ```sh
 ssh-challenge-safe-vps-login sign \
@@ -125,6 +194,10 @@ ssh-challenge-safe-vps-login verify \
 ```
 
 ## Python quickstart
+
+Use `ChallengeManager` inside your web app or operator service. The package
+handles challenge creation and signature verification; your app still owns the
+web session.
 
 ```python
 from pathlib import Path
@@ -154,6 +227,18 @@ if not result.ok:
 See [docs/integration.md](docs/integration.md) and
 [docs/security-model.md](docs/security-model.md) before using this in a
 production admin surface.
+
+## Safe deployment checklist
+
+- Store only public keys in the server-side allowed-signers file.
+- Keep the allowed-signers file outside the web root.
+- Use short challenge TTLs, for example 60 to 120 seconds.
+- Mark a challenge consumed immediately after successful verification.
+- Use HTTPS and secure, HTTP-only, same-site cookies for the browser session.
+- Add CSRF protection for mutating browser routes.
+- Rate-limit challenge creation and completion endpoints.
+- Log decisions and reasons, but not private keys, full signatures, bearer
+  tokens, or real challenge payloads.
 
 ## License
 
