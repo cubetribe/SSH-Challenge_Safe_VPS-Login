@@ -18,5 +18,5 @@ This project follows manual Semantic Versioning after the first implementation.
 - CLI for creating, signing, and verifying challenges.
 - Tests for valid signer, unknown signer, tampered message, expired challenge,
   replayed challenge, wrong namespace, and malformed allowed signers handling.
+- CI validation for lint, tests, and package builds.
 - Integration and security documentation.
-
