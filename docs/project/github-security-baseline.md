@@ -38,6 +38,7 @@ Require these checks from GitHub Actions:
 - `Security / Dependency Review`
 - `Security / Python Audit`
 - `Security / Secret Hygiene`
+- `CodeQL`
 
 ### Actions policy
 
