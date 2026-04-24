@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from ssh_challenge_safe_vps_login import ChallengeManager, sign_message, verify_signature
+
+UTC = timezone.utc
 
 
 def _allowed_signers(tmp_path: Path, public_key: str, identity: str = "operator") -> Path:

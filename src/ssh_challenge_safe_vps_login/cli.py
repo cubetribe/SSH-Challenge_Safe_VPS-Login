@@ -3,12 +3,14 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from . import __version__
 from .challenge import DEFAULT_NAMESPACE, DEFAULT_TTL_SECONDS, create_challenge
 from .signer import OpenSSHError, sign_message, verify_signature
+
+UTC = timezone.utc
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -102,4 +104,3 @@ def _verify(args: argparse.Namespace) -> int:
     )
     print("valid" if valid else "invalid")
     return 0 if valid else 1
-

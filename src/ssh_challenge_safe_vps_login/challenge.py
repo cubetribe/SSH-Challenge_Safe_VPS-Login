@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import secrets
 from dataclasses import dataclass
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 DEFAULT_NAMESPACE = "ssh-challenge-safe-vps-login"
 DEFAULT_TTL_SECONDS = 120
+UTC = timezone.utc
 
 
 class ChallengeError(ValueError):

@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Protocol
 
 from .challenge import DEFAULT_NAMESPACE, DEFAULT_TTL_SECONDS, Challenge, create_challenge
 from .signer import OpenSSHVerifier
+
+UTC = timezone.utc
 
 
 class SignatureVerifier(Protocol):

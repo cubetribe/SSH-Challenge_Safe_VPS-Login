@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
@@ -10,6 +10,8 @@ from ssh_challenge_safe_vps_login import (
     ChallengeError,
     create_challenge,
 )
+
+UTC = timezone.utc
 
 
 def test_create_challenge_builds_canonical_message() -> None:
@@ -96,4 +98,3 @@ def test_expiry_boundary_is_strict() -> None:
 
     assert not challenge.is_expired(issued_at + timedelta(seconds=119))
     assert challenge.is_expired(issued_at + timedelta(seconds=120))
-
