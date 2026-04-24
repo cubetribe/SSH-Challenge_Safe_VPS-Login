@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import os
-import subprocess
+import subprocess  # nosec B404
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
 from .challenge import DEFAULT_NAMESPACE
+
+# OpenSSH is the explicit signing and verification boundary.
 
 
 class OpenSSHError(RuntimeError):
@@ -123,7 +125,8 @@ def verify_signature(
 
 def _run(args: list[str], *, input_text: str | None) -> subprocess.CompletedProcess[str]:
     try:
-        return subprocess.run(
+        # The command is an argv list and never uses shell=True.
+        return subprocess.run(  # nosec B603
             args,
             input=input_text,
             capture_output=True,
@@ -133,4 +136,3 @@ def _run(args: list[str], *, input_text: str | None) -> subprocess.CompletedProc
         )
     except FileNotFoundError as exc:
         raise OpenSSHUnavailableError("ssh-keygen is not available on PATH.") from exc
-
