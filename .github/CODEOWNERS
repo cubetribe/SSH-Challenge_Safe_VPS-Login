@@ -1,0 +1,17 @@
+# Keep repository security controls under the repository owner's review.
+* @cubetribe
+
+/.github/ @cubetribe
+/AGENTS.md @cubetribe
+/SECURITY.md @cubetribe
+/CONTRIBUTING.md @cubetribe
+/README.md @cubetribe
+/LICENSE.md @cubetribe
+/CHANGELOG.md @cubetribe
+/pyproject.toml @cubetribe
+/src/ssh_challenge_safe_vps_login/ @cubetribe
+/tests/ @cubetribe
+/docs/security-model.md @cubetribe
+/docs/integration.md @cubetribe
+/docs/project/ @cubetribe
+/scripts/ci/ @cubetribe
